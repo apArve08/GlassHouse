@@ -6,13 +6,14 @@ import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { renderSessionHtml } from "../packages/viewer/src/index.mjs";
 
 const rootDirectory = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sessionsDirectory = path.join(rootDirectory, "storage", "sessions");
 const genesisHash = "GLASSHOUSE_GENESIS_V1";
 
 function usage() {
-  console.error("Usage: pnpm record:codex -- --cd /path/to/project [--model MODEL] -- \"Your Codex prompt\"");
+  console.error("Usage: pnpm record:codex -- --cd /path/to/project [--model MODEL] [--html] -- \"Your Codex prompt\"");
   process.exit(1);
 }
 
@@ -25,6 +26,7 @@ const directoryIndex = options.indexOf("--cd");
 const projectDirectory = directoryIndex === -1 ? process.cwd() : options[directoryIndex + 1];
 const modelIndex = options.indexOf("--model");
 const model = modelIndex === -1 ? undefined : options[modelIndex + 1];
+const emitHtml = options.includes("--html");
 const prompt = commandArguments.join(" ");
 if (!prompt || (directoryIndex !== -1 && !projectDirectory) || (modelIndex !== -1 && !model)) usage();
 
@@ -103,5 +105,10 @@ codex.on("close", async (code) => {
   await writeFile(temporary, JSON.stringify(session, null, 2), { flag: "wx" });
   await rename(temporary, target);
   console.error(`\nGlasshouse recorded ${session.events.length} observable events: ${target}`);
+  if (emitHtml) {
+    const htmlTarget = path.join(sessionsDirectory, `${session.id}.html`);
+    await writeFile(htmlTarget, await renderSessionHtml(session), { flag: "wx" });
+    console.error(`Self-contained replay (open it in any browser, no server needed): ${htmlTarget}`);
+  }
   process.exitCode = code ?? 1;
 });

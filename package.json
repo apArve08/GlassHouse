@@ -6,7 +6,12 @@
     "dev": "pnpm --filter @glasshouse/web dev",
     "build": "pnpm --filter @glasshouse/web build",
     "typecheck": "pnpm --filter @glasshouse/web typecheck",
-    "record:codex": "node ./bin/glasshouse-codex.mjs"
+    "record:codex": "node ./bin/glasshouse-codex.mjs",
+    "session:html": "node ./bin/glasshouse-html.mjs",
+    "build:viewer": "node ./bin/glasshouse-html.mjs --viewer outputs/glasshouse.html",
+    "build:site": "node bin/glasshouse-html.mjs --viewer site/index.html"
   },
-  "devDependencies": { "typescript": "^5.7.3" }
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
 }

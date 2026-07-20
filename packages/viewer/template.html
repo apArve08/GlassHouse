@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glasshouse — Session Replay</title>
+<style>
+:root{--bg:#0a0c10;--panel:#10131a;--line:#252b36;--text:#eef0f5;--cyan:#56e4d0;--sans:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;--mono:'DM Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px}
+button{font:inherit;color:inherit;cursor:pointer}
+main{display:flex;min-height:100vh}
+.sidebar{width:244px;border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;background:#0c0f14}
+.brand{font-size:18px;font-weight:800;letter-spacing:-.8px;display:flex;align-items:center;gap:8px;padding:0 7px 27px}
+.brand-mark{width:27px;height:27px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(140deg,#6ee7d8,#7a75ed);color:#071210}
+.brand em{color:#818a9b;font-size:12px;font-style:normal;font-weight:600;letter-spacing:0}
+.eyebrow{display:block;font-size:9px;color:#737c8e;font-weight:800;letter-spacing:1.15px}
+.workspace{border-top:1px solid #1d222c;border-bottom:1px solid #1d222c;padding:15px 7px}
+.repo{width:100%;background:none;border:0;padding:9px 0 0;text-align:left;font-size:12px;display:flex;align-items:center;gap:7px;cursor:default}
+.repo-dot{height:7px;width:7px;border-radius:50%;background:#62e9bd;flex:0 0 auto}
+.meta-list{padding:18px 7px;display:grid;gap:11px}
+.meta-list div{display:grid;gap:3px}
+.meta-list span{font-size:9px;color:#737c8e;font-weight:800;letter-spacing:1.15px}
+.meta-list b{font:11px var(--mono);font-weight:500;color:#c6ceda;word-break:break-all}
+.side-bottom{margin-top:auto;display:grid;gap:7px}
+.recording{font:11px var(--mono);color:#8590a0;padding:10px 7px;display:flex;gap:7px;align-items:center}
+.pulse{height:7px;width:7px;border-radius:50%;background:#62e9bd}
+.ghost-button{border:1px solid #2a3140;background:#151a23;border-radius:7px;padding:9px 10px;display:flex;align-items:center;gap:7px;font-weight:700;font-size:11px;width:100%}
+.ghost-button:hover{background:#1a202b}
+.content{flex:1;min-width:0;padding:32px 38px;max-width:1600px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:25px;gap:16px}
+h1{font-size:24px;letter-spacing:-.9px;margin:5px 0 0;overflow-wrap:anywhere}
+h1 span{font-size:13px;font-weight:500;color:#818b9d;letter-spacing:0}
+.header-actions{display:flex;gap:10px;align-items:center;flex:0 0 auto}
+.integrity{font-size:11px;font-weight:800;padding:9px 11px;border:1px solid;border-radius:7px;display:flex;gap:7px;align-items:center;text-transform:uppercase;letter-spacing:.35px}
+.integrity.good{color:#56e4c3;border-color:#245f55;background:#10251f}
+.integrity.bad{color:#ff8190;border-color:#713642;background:#2b141b}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px;position:relative;min-height:76px}
+.stat svg{color:#7c8595;position:absolute;right:11px;top:12px}
+.stat span{color:#7c8595;font-size:10px;display:block}
+.stat strong{font-size:20px;letter-spacing:-.8px;display:block;margin-top:10px;overflow-wrap:anywhere}
+.replay-grid{display:grid;grid-template-columns:minmax(380px,.85fr) minmax(450px,1.15fr);gap:18px}
+.timeline-panel,.inspector-panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.panel-head{padding:17px 19px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.panel-head strong{display:block;margin-top:4px;font-size:12px}
+.live-dot{font:10px var(--mono);color:#7c8798}
+.timeline{padding:8px 9px;height:441px;overflow:auto}
+.event{width:100%;display:flex;align-items:center;gap:10px;border:0;background:transparent;border-radius:7px;padding:9px 8px;text-align:left;position:relative}
+.event:hover,.event.selected{background:#1a202b}
+.event.selected:before{content:"";position:absolute;left:0;height:21px;width:2px;background:var(--cyan);border-radius:2px}
+.event time{font:10px var(--mono);color:#737c8d;width:40px;flex:0 0 auto}
+.event-icon{width:27px;height:27px;border-radius:7px;display:grid;place-items:center;flex:0 0 auto}
+.cyan{color:#5ce2d2;background:#16312f}.violet{color:#c0aaff;background:#2a2144}.blue{color:#8bb8ff;background:#182b48}
+.emerald{color:#71e6b9;background:#14352c}.amber{color:#ffd07b;background:#3a2d16}.slate{color:#a4adba;background:#202631}.rose{color:#ff8593;background:#432027}
+.event-copy{min-width:0;display:grid;gap:2px}
+.event-copy b{font-size:11px}
+.event-copy small{font:10px var(--mono);color:#778193;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:235px}
+.bad-icon{margin-left:auto;color:#ff7582;flex:0 0 auto}
+.event.corrupt{background:#26151c}
+.controls{border-top:1px solid var(--line);padding:13px 17px;display:flex;align-items:center;gap:7px}
+.controls button{height:29px;min-width:29px;border:1px solid #2e3541;border-radius:6px;background:#181d26;display:grid;place-items:center}
+.controls .play{background:#4ad7c5;color:#071816;border:0}
+.controls .speed{font:10px var(--mono);padding:0 7px}
+.scrubber{height:3px;background:#292f3a;flex:1;margin:0 4px;border-radius:2px}
+.scrubber span{display:block;height:100%;background:var(--cyan);border-radius:2px}
+.inspector-panel{padding:21px}
+.inspector-body{animation:rise .18s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.inspector-title{display:flex;align-items:center;gap:10px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.inspector-title h2{font-size:15px;margin:3px 0 0;letter-spacing:-.3px}
+.timestamp{margin-left:auto;font:11px var(--mono);color:#7c8595}
+.payload{padding-top:17px}
+.detail-row{display:flex;justify-content:space-between;gap:14px;color:#838d9d;font-size:11px;padding:8px 0}
+.detail-row b{color:#e6eaf2}
+.detail-row code{color:#b9c1ce;font:11px var(--mono);word-break:break-all;text-align:right}
+.section-label{font-size:9px;letter-spacing:1px;color:#747e8f;font-weight:800;margin:19px 0 8px}
+pre{font:11px/1.65 var(--mono);margin:0;background:#0b0e13;border:1px solid #222833;border-radius:7px;padding:14px;color:#c5ccda;white-space:pre-wrap;overflow:auto;max-height:420px;overflow-wrap:anywhere}
+.hash-box{border-top:1px solid var(--line);margin-top:20px;padding-top:14px;display:grid;gap:9px}
+.hash-box>div:not(.hash-status){display:flex;justify-content:space-between;font-size:10px;color:#808999}
+.hash-box code{font:10px var(--mono);color:#adb7c6}
+.hash-status{margin-top:3px;background:#11251f;color:#57dfbd;border-radius:6px;font:10px var(--mono);font-weight:500;padding:9px;display:flex;gap:7px;align-items:center}
+.hash-status.invalid{background:#38171e;color:#ff8591}
+.diff{padding-top:17px}
+.diff-tabs{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.diff-tabs b{font-size:11px}
+.diff-tabs span{font-size:10px;color:#7d8798}
+.diff pre{padding:9px 0}
+.diff pre div{padding:2px 11px}
+.removed{color:#ffabb3;background:#331d25}
+.added{color:#8ce7bf;background:#153226}
+.hunk{color:#8bb8ff;background:#141d2b}
+.empty{display:grid;place-items:center;min-height:100vh;width:100%;text-align:center;padding:40px}
+.empty .brand{padding-bottom:18px;justify-content:center}
+.empty p{color:#818b9d;max-width:430px;line-height:1.7;margin:0 0 22px}
+.empty label{border:1px dashed #2f3745;background:#10131a;border-radius:10px;padding:26px 34px;display:block;cursor:pointer;color:#c6ceda;font-weight:600}
+.empty label:hover{border-color:var(--cyan);color:#fff}
+.empty input{display:none}
+.dropping:after{content:"Drop a Glasshouse session";position:fixed;inset:14px;border:2px dashed var(--cyan);border-radius:14px;background:rgba(10,12,16,.85);display:grid;place-items:center;font-weight:800;color:var(--cyan);z-index:9;letter-spacing:.4px}
+.load-error{color:#ff8591;font-size:11px;margin:-14px 0 17px}
+@media(max-width:1050px){.stats{grid-template-columns:repeat(3,1fr)}.replay-grid{grid-template-columns:1fr}.sidebar{width:205px}.content{padding:25px}}
+@media(max-width:720px){.sidebar{display:none}.content{padding:18px}header{align-items:flex-start;gap:14px;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.header-actions{flex-wrap:wrap}.timeline{height:390px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script id="glasshouse-session" type="application/json">__GLASSHOUSE_SESSION__</script>
+<script>
+(function () {
+"use strict";
+
+/* ---------- SHA-256 (pure JS: no secure-context requirement, works from file://) ---------- */
+var K = [
+0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+
+function rotr(x, n) { return (x >>> n) | (x << (32 - n)); }
+
+function sha256Hex(text) {
+  var bytes = new TextEncoder().encode(text);
+  var bitLength = bytes.length * 8;
+  var padded = new Uint8Array((((bytes.length + 8) >> 6) + 1) << 6);
+  padded.set(bytes);
+  padded[bytes.length] = 0x80;
+  var view = new DataView(padded.buffer);
+  view.setUint32(padded.length - 8, Math.floor(bitLength / 4294967296));
+  view.setUint32(padded.length - 4, bitLength >>> 0);
+
+  var h = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  var w = new Uint32Array(64);
+
+  for (var offset = 0; offset < padded.length; offset += 64) {
+    for (var i = 0; i < 16; i++) w[i] = view.getUint32(offset + i * 4);
+    for (i = 16; i < 64; i++) {
+      var s0 = rotr(w[i-15],7) ^ rotr(w[i-15],18) ^ (w[i-15] >>> 3);
+      var s1 = rotr(w[i-2],17) ^ rotr(w[i-2],19) ^ (w[i-2] >>> 10);
+      w[i] = (w[i-16] + s0 + w[i-7] + s1) >>> 0;
+    }
+    var a=h[0],b=h[1],c=h[2],d=h[3],e=h[4],f=h[5],g=h[6],hh=h[7];
+    for (i = 0; i < 64; i++) {
+      var S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25);
+      var ch = (e & f) ^ (~e & g);
+      var t1 = (hh + S1 + ch + K[i] + w[i]) >>> 0;
+      var S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22);
+      var maj = (a & b) ^ (a & c) ^ (b & c);
+      var t2 = (S0 + maj) >>> 0;
+      hh=g; g=f; f=e; e=(d + t1) >>> 0; d=c; c=b; b=a; a=(t1 + t2) >>> 0;
+    }
+    h[0]=(h[0]+a)>>>0; h[1]=(h[1]+b)>>>0; h[2]=(h[2]+c)>>>0; h[3]=(h[3]+d)>>>0;
+    h[4]=(h[4]+e)>>>0; h[5]=(h[5]+f)>>>0; h[6]=(h[6]+g)>>>0; h[7]=(h[7]+hh)>>>0;
+  }
+  var out = "";
+  for (i = 0; i < 8; i++) out += ("00000000" + h[i].toString(16)).slice(-8);
+  return out;
+}
+
+/* ---------- Chain verification (must match @glasshouse/hash exactly) ---------- */
+var GENESIS_HASH = "GLASSHOUSE_GENESIS_V1";
+
+function sortValue(value) {
+  if (Array.isArray(value)) return value.map(sortValue);
+  if (value !== null && typeof value === "object") {
+    var sorted = {};
+    Object.keys(value).sort(function (left, right) { return left.localeCompare(right); })
+      .forEach(function (key) { sorted[key] = sortValue(value[key]); });
+    return sorted;
+  }
+  return value;
+}
+
+function eventHash(previousHash, timestamp, payload) {
+  return sha256Hex(previousHash + timestamp + JSON.stringify(sortValue(payload)));
+}
+
+function verifyChain(events) {
+  var previousHash = GENESIS_HASH;
+  var corruptedEventIds = [];
+  events.forEach(function (event) {
+    var expected = eventHash(previousHash, event.timestamp, event.payload);
+    if (event.previous_hash !== previousHash || event.current_hash !== expected) corruptedEventIds.push(event.id);
+    previousHash = event.current_hash;
+  });
+  return { valid: corruptedEventIds.length === 0, corruptedEventIds: corruptedEventIds };
+}
+
+/* ---------- Icons ---------- */
+var paths = {
+  zap: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>',
+  dot: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
+  code: '<path d="m9 17-5-5 5-5"/><path d="m15 7 5 5-5 5"/>',
+  folder: '<path d="M3 19V6a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v2"/><path d="M3 19h15l3-8H6l-3 8Z"/>',
+  file: '<path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7Z"/><path d="M14 3v4h4"/>',
+  terminal: '<path d="m5 8 4 4-4 4"/><path d="M12 17h7"/>',
+  alert: '<path d="M12 4 2.5 20h19L12 4Z"/><path d="M12 10v4"/><path d="M12 17.5v.5"/>',
+  flask: '<path d="M10 3v6L4.5 19a1 1 0 0 0 .9 1.5h13.2a1 1 0 0 0 .9-1.5L14 9V3"/><path d="M9 3h6"/>',
+  branch: '<circle cx="7" cy="6" r="2.5"/><circle cx="7" cy="18" r="2.5"/><circle cx="17" cy="9" r="2.5"/><path d="M7 8.5v7"/><path d="M17 11.5c0 3-4 2.5-7 4"/>',
+  check: '<path d="m4 12.5 5 5L20 6.5"/>',
+  shield: '<path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3Z"/><path d="m9 12 2 2 4-4"/>',
+  shieldX: '<path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3Z"/><path d="m9.5 9.5 5 5"/><path d="m14.5 9.5-5 5"/>',
+  play: '<path d="M7 4.5v15l13-7.5-13-7.5Z" fill="currentColor"/>',
+  pause: '<path d="M8 4.5v15M16 4.5v15"/>',
+  left: '<path d="m14 6-6 6 6 6"/>',
+  right: '<path d="m10 6 6 6-6 6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2"/>',
+  layers: '<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 15 9 5 9-5"/>',
+  cpu: '<rect x="6" y="6" width="12" height="12" rx="1.5"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/>',
+  upload: '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>',
+  download: '<path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>'
+};
+
+function icon(name, size) {
+  return '<svg width="' + (size || 16) + '" height="' + (size || 16) + '" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + (paths[name] || paths.dot) + '</svg>';
+}
+
+/* ---------- Event presentation ---------- */
+var typeMeta = {
+  SESSION_STARTED:  { label: "Session started",  icon: "zap",      tone: "cyan" },
+  USER_PROMPT:      { label: "Prompt received",  icon: "dot",      tone: "violet" },
+  ASSISTANT_MESSAGE:{ label: "Agent message",    icon: "code",     tone: "violet" },
+  FILE_READ:        { label: "Read file",        icon: "folder",   tone: "blue" },
+  FILE_WRITE:       { label: "Write file",       icon: "file",     tone: "emerald" },
+  COMMAND_STARTED:  { label: "Command started",  icon: "terminal", tone: "amber" },
+  COMMAND_FINISHED: { label: "Command finished", icon: "terminal", tone: "amber" },
+  STDOUT:           { label: "Output",           icon: "terminal", tone: "slate" },
+  STDERR:           { label: "Error output",     icon: "alert",    tone: "rose" },
+  TEST_STARTED:     { label: "Tests started",    icon: "flask",    tone: "amber" },
+  TEST_FINISHED:    { label: "Tests finished",   icon: "flask",    tone: "emerald" },
+  DIFF_CREATED:     { label: "Diff created",     icon: "branch",   tone: "emerald" },
+  SESSION_FINISHED: { label: "Session finished", icon: "check",    tone: "cyan" }
+};
+
+function metaFor(type) { return typeMeta[type] || { label: type, icon: "dot", tone: "slate" }; }
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, function (character) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
+  });
+}
+
+function shortHash(hash) { return String(hash).slice(0, 10) + "…" + String(hash).slice(-6); }
+
+function summaryOf(payload) {
+  var candidate = payload.path || payload.command || payload.text || payload.message ||
+    payload.output || payload.outcome || payload.projectDirectory || "";
+  return String(candidate).replace(/\s+/g, " ").slice(0, 160);
+}
+
+function elapsedLabel(startMs, timestamp) {
+  var seconds = Math.max(0, Math.round((new Date(timestamp).getTime() - startMs) / 1000));
+  var minutes = Math.floor(seconds / 60);
+  return String(minutes).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
+}
+
+function durationLabel(events) {
+  if (events.length < 2) return "00:00";
+  var start = new Date(events[0].timestamp).getTime();
+  return elapsedLabel(start, events[events.length - 1].timestamp);
+}
+
+/* ---------- State ---------- */
+var state = { session: null, events: [], integrity: { valid: true, corruptedEventIds: [] }, selected: 0, playing: false, speed: 1, error: "" };
+var timer = null;
+var app = document.getElementById("app");
+
+function loadSession(session) {
+  state.session = session;
+  state.events = session.events || [];
+  state.integrity = verifyChain(state.events);
+  state.selected = 0;
+  state.playing = false;
+  state.error = "";
+  stopTimer();
+  render();
+}
+
+function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+
+function startTimer() {
+  stopTimer();
+  timer = setInterval(function () {
+    if (state.selected >= state.events.length - 1) { state.playing = false; stopTimer(); render(); return; }
+    state.selected += 1;
+    render();
+  }, 900 / state.speed);
+}
+
+/* ---------- Rendering ---------- */
+function statsFor(events) {
+  var counted = function (predicate) { return events.filter(predicate).length; };
+  var files = {};
+  events.forEach(function (event) { if (event.type === "FILE_WRITE" && event.payload.path) files[event.payload.path] = true; });
+  return [
+    { label: "Session duration", value: durationLabel(events), icon: "clock" },
+    { label: "Events captured", value: String(events.length), icon: "layers" },
+    { label: "Files modified", value: String(Object.keys(files).length), icon: "file" },
+    { label: "Commands", value: String(counted(function (e) { return e.type === "COMMAND_STARTED"; })), icon: "terminal" },
+    { label: "Errors", value: String(counted(function (e) { return e.type === "STDERR"; })), icon: "alert" },
+    { label: "Agent", value: escapeHtml((state.session && state.session.agent) || "unknown"), icon: "cpu" }
+  ];
+}
+
+function renderDiff(payload) {
+  if (typeof payload.diff === "string" && payload.diff) {
+    var lines = payload.diff.split("\n").map(function (line) {
+      var className = line.charAt(0) === "+" ? "added" : line.charAt(0) === "-" ? "removed" : line.charAt(0) === "@" ? "hunk" : "";
+      return '<div class="' + className + '">' + escapeHtml(line || " ") + "</div>";
+    }).join("");
+    return '<div class="diff"><div class="diff-tabs"><b>Unified diff</b><span>' + escapeHtml(payload.kind || "update") +
+      "</span></div><pre>" + lines + '</pre><div class="detail-row"><span>Path</span><code>' + escapeHtml(payload.path || "unknown") + "</code></div></div>";
+  }
+  if (typeof payload.before === "string" || typeof payload.after === "string") {
+    var before = String(payload.before || "").split("\n").map(function (line) { return '<div class="removed">− ' + escapeHtml(line) + "</div>"; }).join("");
+    var after = String(payload.after || "").split("\n").map(function (line) { return '<div class="added">+ ' + escapeHtml(line) + "</div>"; }).join("");
+    return '<div class="diff"><div class="diff-tabs"><b>Unified diff</b><span>Before / after captured</span></div><pre>' +
+      before + after + '</pre><div class="detail-row"><span>Path</span><code>' + escapeHtml(payload.path || "unknown") + "</code></div></div>";
+  }
+  return renderPayload(null);
+}
+
+function renderPayload(event) {
+  var target = event || state.events[state.selected];
+  return '<div class="payload">' +
+    '<div class="detail-row"><span>Event ID</span><code>' + escapeHtml(target.id) + "</code></div>" +
+    (target.duration ? '<div class="detail-row"><span>Duration</span><b>' + escapeHtml(target.duration) + " ms</b></div>" : "") +
+    '<p class="section-label">PAYLOAD</p><pre>' + escapeHtml(JSON.stringify(target.payload, null, 2)) + "</pre>" +
+    (target.metadata ? '<p class="section-label">METADATA</p><pre>' + escapeHtml(JSON.stringify(target.metadata, null, 2)) + "</pre>" : "") +
+    "</div>";
+}
+
+function renderEmpty() {
+  app.innerHTML =
+    '<div class="empty"><div>' +
+      '<div class="brand"><div class="brand-mark">' + icon("shield", 18) + "</div><span>glasshouse</span><em>lite</em></div>" +
+      "<p>Tamper-evident replay for coding agents. Drop a recorded session file here to inspect its timeline, diffs, and hash chain. Nothing is uploaded — verification runs entirely in this page.</p>" +
+      '<label>' + icon("upload", 17) + " &nbsp;Choose or drop a session JSON<input type=\"file\" accept=\".json,application/json\" id=\"file-input\"></label>" +
+      (state.error ? '<p class="load-error" style="margin-top:18px">' + escapeHtml(state.error) + "</p>" : "") +
+    "</div></div>";
+  wireFileInput();
+}
+
+function render() {
+  if (!state.session) { renderEmpty(); return; }
+
+  var events = state.events;
+  var corrupt = state.integrity.corruptedEventIds;
+  var selectedEvent = events[state.selected];
+  var startMs = events.length ? new Date(events[0].timestamp).getTime() : 0;
+  var title = state.session.title || "Recorded session";
+
+  var timelineHtml = events.map(function (event, index) {
+    var meta = metaFor(event.type);
+    var isBad = corrupt.indexOf(event.id) !== -1;
+    return '<button class="event' + (state.selected === index ? " selected" : "") + (isBad ? " corrupt" : "") + '" data-index="' + index + '">' +
+      "<time>" + elapsedLabel(startMs, event.timestamp) + "</time>" +
+      '<span class="event-icon ' + meta.tone + '">' + icon(meta.icon, 15) + "</span>" +
+      '<span class="event-copy"><b>' + escapeHtml(meta.label) + "</b><small>" + escapeHtml(summaryOf(event.payload)) + "</small></span>" +
+      (isBad ? '<span class="bad-icon">' + icon("alert", 16) + "</span>" : "") +
+      "</button>";
+  }).join("");
+
+  var statsHtml = statsFor(events).map(function (stat) {
+    return '<div class="stat">' + icon(stat.icon, 15) + "<span>" + stat.label + "</span><strong>" + stat.value + "</strong></div>";
+  }).join("");
+
+  var inspectorHtml = "";
+  if (selectedEvent) {
+    var meta = metaFor(selectedEvent.type);
+    var isBad = corrupt.indexOf(selectedEvent.id) !== -1;
+    inspectorHtml =
+      '<div class="inspector-body">' +
+        '<div class="inspector-title"><span class="event-icon ' + meta.tone + '">' + icon(meta.icon, 17) + "</span>" +
+        '<div><span class="eyebrow">INSPECTOR</span><h2>' + escapeHtml(meta.label) + "</h2></div>" +
+        '<span class="timestamp">' + elapsedLabel(startMs, selectedEvent.timestamp) + "</span></div>" +
+        (selectedEvent.type === "FILE_WRITE" ? renderDiff(selectedEvent.payload) : renderPayload(selectedEvent)) +
+        '<div class="hash-box">' +
+          "<div><span>Previous hash</span><code>" + escapeHtml(shortHash(selectedEvent.previous_hash)) + "</code></div>" +
+          "<div><span>Current hash</span><code>" + escapeHtml(shortHash(selectedEvent.current_hash)) + "</code></div>" +
+          '<div class="hash-status' + (isBad ? " invalid" : "") + '">' + icon(isBad ? "shieldX" : "check", 15) + " " +
+            (isBad ? "HASH VERIFICATION FAILED" : "CRYPTOGRAPHICALLY LINKED") + "</div>" +
+        "</div>" +
+      "</div>";
+  }
+
+  app.innerHTML =
+    "<main>" +
+      '<aside class="sidebar">' +
+        '<div class="brand"><div class="brand-mark">' + icon("shield", 18) + "</div><span>glasshouse</span><em>lite</em></div>" +
+        '<div class="workspace"><span class="eyebrow">SESSION</span><button class="repo"><span class="repo-dot"></span>' + escapeHtml(title) + "</button></div>" +
+        '<div class="meta-list">' +
+          "<div><span>AGENT</span><b>" + escapeHtml(state.session.agent || "unknown") + "</b></div>" +
+          "<div><span>STARTED</span><b>" + escapeHtml(new Date(state.session.startedAt).toLocaleString()) + "</b></div>" +
+          "<div><span>SESSION ID</span><b>" + escapeHtml(state.session.id) + "</b></div>" +
+        "</div>" +
+        '<div class="side-bottom">' +
+          '<div class="recording"><span class="pulse"></span>Verified in-page · offline</div>' +
+          '<button class="ghost-button" id="export">' + icon("download", 15) + " Export session JSON</button>" +
+          '<label class="ghost-button" for="file-input">' + icon("upload", 15) + " Open another session</label>" +
+          '<input type="file" accept=".json,application/json" id="file-input" style="display:none">' +
+        "</div>" +
+      "</aside>" +
+      '<section class="content">' +
+        "<header><div>" +
+          '<p class="eyebrow">SESSION REPLAY</p>' +
+          "<h1>" + escapeHtml(title) + " <span>· " + escapeHtml(state.session.agent || "unknown") + "</span></h1>" +
+        "</div>" +
+        '<div class="header-actions"><div class="integrity ' + (state.integrity.valid ? "good" : "bad") + '">' +
+          icon(state.integrity.valid ? "shield" : "shieldX", 17) + " " +
+          (state.integrity.valid ? "Verified" : "Integrity check failed") + "</div></div></header>" +
+        (state.error ? '<p class="load-error">' + escapeHtml(state.error) + "</p>" : "") +
+        '<div class="stats">' + statsHtml + "</div>" +
+        '<div class="replay-grid">' +
+          '<section class="timeline-panel">' +
+            '<div class="panel-head"><div><span class="eyebrow">EVENT TIMELINE</span><strong>' + events.length +
+              ' events captured</strong></div><span class="live-dot">immutable log</span></div>' +
+            '<div class="timeline">' + timelineHtml + "</div>" +
+            '<div class="controls">' +
+              '<button id="prev">' + icon("left", 18) + "</button>" +
+              '<button class="play" id="play">' + icon(state.playing ? "pause" : "play", 18) + "</button>" +
+              '<button id="next">' + icon("right", 18) + "</button>" +
+              '<div class="scrubber"><span style="width:' + (events.length > 1 ? (state.selected / (events.length - 1)) * 100 : 0) + '%"></span></div>' +
+              '<button class="speed" id="speed">' + state.speed + "×</button>" +
+            "</div>" +
+          "</section>" +
+          '<section class="inspector-panel">' + inspectorHtml + "</section>" +
+        "</div>" +
+      "</section>" +
+    "</main>";
+
+  wireControls();
+  wireFileInput();
+}
+
+function wireControls() {
+  var timeline = app.querySelector(".timeline");
+  if (timeline) {
+    timeline.addEventListener("click", function (browserEvent) {
+      var button = browserEvent.target.closest(".event");
+      if (!button) return;
+      state.selected = Number(button.dataset.index);
+      state.playing = false;
+      stopTimer();
+      render();
+    });
+    var selectedNode = timeline.querySelector(".event.selected");
+    if (selectedNode) selectedNode.scrollIntoView({ block: "nearest" });
+  }
+
+  var bind = function (id, handler) { var node = app.querySelector("#" + id); if (node) node.addEventListener("click", handler); };
+  bind("prev", function () { state.selected = Math.max(0, state.selected - 1); state.playing = false; stopTimer(); render(); });
+  bind("next", function () { state.selected = Math.min(state.events.length - 1, state.selected + 1); state.playing = false; stopTimer(); render(); });
+  bind("play", function () {
+    state.playing = !state.playing;
+    if (state.playing && state.selected >= state.events.length - 1) state.selected = 0;
+    if (state.playing) startTimer(); else stopTimer();
+    render();
+  });
+  bind("speed", function () {
+    state.speed = state.speed === 1 ? 2 : state.speed === 2 ? 0.5 : 1;
+    if (state.playing) startTimer();
+    render();
+  });
+  bind("export", function () {
+    var blob = new Blob([JSON.stringify(state.session, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = state.session.id + ".json";
+    anchor.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+function acceptFile(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function () {
+    try {
+      var parsed = JSON.parse(String(reader.result));
+      if (!parsed || !Array.isArray(parsed.events) || !parsed.events.length) throw new Error("no events");
+      loadSession(parsed);
+    } catch (error) {
+      state.error = "That file is not a Glasshouse session (expected JSON with an events array).";
+      render();
+    }
+  };
+  reader.readAsText(file);
+}
+
+function wireFileInput() {
+  var input = app.querySelector("#file-input");
+  if (input) input.addEventListener("change", function () { acceptFile(this.files[0]); });
+}
+
+document.addEventListener("dragover", function (browserEvent) { browserEvent.preventDefault(); document.body.classList.add("dropping"); });
+document.addEventListener("dragleave", function (browserEvent) { if (browserEvent.relatedTarget === null) document.body.classList.remove("dropping"); });
+document.addEventListener("drop", function (browserEvent) {
+  browserEvent.preventDefault();
+  document.body.classList.remove("dropping");
+  if (browserEvent.dataTransfer) acceptFile(browserEvent.dataTransfer.files[0]);
+});
+document.addEventListener("keydown", function (browserEvent) {
+  if (!state.session) return;
+  if (browserEvent.key === "ArrowLeft") { state.selected = Math.max(0, state.selected - 1); state.playing = false; stopTimer(); render(); }
+  if (browserEvent.key === "ArrowRight") { state.selected = Math.min(state.events.length - 1, state.selected + 1); state.playing = false; stopTimer(); render(); }
+  if (browserEvent.key === " ") { browserEvent.preventDefault(); app.querySelector("#play").click(); }
+});
+
+var embedded = null;
+try { embedded = JSON.parse(document.getElementById("glasshouse-session").textContent); } catch (error) { embedded = null; }
+if (embedded && Array.isArray(embedded.events) && embedded.events.length) loadSession(embedded); else renderEmpty();
+})();
+</script>
+</body>
+</html>
