@@ -1,0 +1,48 @@
+{
+  "id": "a57e4581-00a3-4d96-a3f7-efcd1a8fc0f3",
+  "agent": "codex-cli",
+  "startedAt": "2026-07-19T17:12:20.352Z",
+  "events": [
+    {
+      "id": "e35ea2b9-e822-41d2-8846-0580ba581d0a",
+      "timestamp": "2026-07-19T17:12:20.354Z",
+      "type": "SESSION_STARTED",
+      "payload": {
+        "projectDirectory": "/Users/ap/Documents/my-real-project"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "ae0c434a2de7374ac3418ced7a9b43c846b1dd32a4efbc7f7a8843d5f9b42980"
+    },
+    {
+      "id": "d453b481-465e-4575-8c03-225074f59a4b",
+      "timestamp": "2026-07-19T17:12:20.354Z",
+      "type": "USER_PROMPT",
+      "payload": {
+        "text": "add a README describing this architecture"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "ae0c434a2de7374ac3418ced7a9b43c846b1dd32a4efbc7f7a8843d5f9b42980",
+      "current_hash": "4b1701aee4ba43de66f53292bff5d467e6e14d5efab0dbb8124d1876ac602aca"
+    },
+    {
+      "id": "b9601a34-3d9c-46eb-bf13-7a4683ad12a1",
+      "timestamp": "2026-07-19T17:12:20.637Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "exitCode": 1,
+        "outcome": "failure"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "4b1701aee4ba43de66f53292bff5d467e6e14d5efab0dbb8124d1876ac602aca",
+      "current_hash": "b7324c04b8a4282b158d3ca1fd9068a1737b13c8cd52359429ccbb2a5d3ebeee"
+    }
+  ],
+  "finishedAt": "2026-07-19T17:12:20.643Z"
+}

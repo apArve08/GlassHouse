@@ -1,0 +1,12 @@
+{
+  "name": "glasshouse-lite",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --filter @glasshouse/web dev",
+    "build": "pnpm --filter @glasshouse/web build",
+    "typecheck": "pnpm --filter @glasshouse/web typecheck",
+    "record:codex": "node ./bin/glasshouse-codex.mjs"
+  },
+  "devDependencies": { "typescript": "^5.7.3" }
+}

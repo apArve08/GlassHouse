@@ -1,0 +1,48 @@
+{
+  "id": "67601283-e95a-409b-bda1-17502115d3cb",
+  "agent": "codex-cli",
+  "startedAt": "2026-07-19T17:03:40.917Z",
+  "events": [
+    {
+      "id": "c069e769-c2d2-4e9d-95c6-0f4137c02ca8",
+      "timestamp": "2026-07-19T17:03:40.919Z",
+      "type": "SESSION_STARTED",
+      "payload": {
+        "projectDirectory": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "66fe95f347aec3d30f61672fc9bcaf98b892505761bf6e5b40b626755a25cf37"
+    },
+    {
+      "id": "63f5a477-f6db-4186-bc5f-621e882f6920",
+      "timestamp": "2026-07-19T17:03:40.920Z",
+      "type": "USER_PROMPT",
+      "payload": {
+        "text": "--cd /path/to/your/project -- Build a landing page"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "66fe95f347aec3d30f61672fc9bcaf98b892505761bf6e5b40b626755a25cf37",
+      "current_hash": "7f734a10b243de11a6bf56b2b49cb4392bf86ac83a0c22a6b49cfb6b6f4b07c2"
+    },
+    {
+      "id": "ed104a14-f111-4b0f-a872-27b3724cbb01",
+      "timestamp": "2026-07-19T17:03:41.216Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "exitCode": 2,
+        "outcome": "failure"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "7f734a10b243de11a6bf56b2b49cb4392bf86ac83a0c22a6b49cfb6b6f4b07c2",
+      "current_hash": "3c640f161a830faad67872b2fb739e2c0fe57f79da6668469ee3542b9d6243c2"
+    }
+  ],
+  "finishedAt": "2026-07-19T17:03:41.222Z"
+}

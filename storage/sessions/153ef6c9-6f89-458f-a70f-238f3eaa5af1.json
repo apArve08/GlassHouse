@@ -1,0 +1,48 @@
+{
+  "id": "153ef6c9-6f89-458f-a70f-238f3eaa5af1",
+  "agent": "codex-cli",
+  "startedAt": "2026-07-19T17:09:59.734Z",
+  "events": [
+    {
+      "id": "8e86e930-d48c-4505-a3c8-548e96a0f7f6",
+      "timestamp": "2026-07-19T17:09:59.736Z",
+      "type": "SESSION_STARTED",
+      "payload": {
+        "projectDirectory": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "325ff8a99b0798af9374201f7999121effadf71cccff37301ec57b7040aa4ad9"
+    },
+    {
+      "id": "9fe2e1fd-00d9-40e1-afb5-9fd51f0956c2",
+      "timestamp": "2026-07-19T17:09:59.737Z",
+      "type": "USER_PROMPT",
+      "payload": {
+        "text": "add a documentation md based on the project architecture and development"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "325ff8a99b0798af9374201f7999121effadf71cccff37301ec57b7040aa4ad9",
+      "current_hash": "30b3866244244cfc4a6e40bd2444ed0d4e3f65fe7363f6c023df8bbc4fdcf7c4"
+    },
+    {
+      "id": "646614b8-d975-4271-a487-3ab310dabf44",
+      "timestamp": "2026-07-19T17:10:00.131Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "exitCode": 1,
+        "outcome": "failure"
+      },
+      "metadata": {
+        "source": "glasshouse-wrapper"
+      },
+      "previous_hash": "30b3866244244cfc4a6e40bd2444ed0d4e3f65fe7363f6c023df8bbc4fdcf7c4",
+      "current_hash": "c3ccfc83ce053184826294dfb3e2b04e6711cb46de48723d57d6de2422801376"
+    }
+  ],
+  "finishedAt": "2026-07-19T17:10:00.138Z"
+}
