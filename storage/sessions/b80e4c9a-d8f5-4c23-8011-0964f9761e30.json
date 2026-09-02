@@ -1,0 +1,144 @@
+{
+  "id": "b80e4c9a-d8f5-4c23-8011-0964f9761e30",
+  "agent": "claude-code",
+  "title": "build",
+  "startedAt": "2026-07-25T17:31:34.165Z",
+  "events": [
+    {
+      "id": "c540ae15-87a4-45df-b6c9-2b42c75f799e",
+      "timestamp": "2026-07-25T17:31:34.171Z",
+      "type": "SESSION_STARTED",
+      "payload": {
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build",
+        "source": "startup"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "SessionStart"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "684ec8a5f86762c4037fdaf59c14d02623d7fbe09f4591b726df226daf2a72ad"
+    },
+    {
+      "id": "9a061e00-8ef0-4593-a05f-6e6356d5517c",
+      "timestamp": "2026-07-25T17:32:05.803Z",
+      "type": "USER_PROMPT",
+      "payload": {
+        "text": "how this works . is it only working on this project folder or all agents across other place as well"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "UserPromptSubmit"
+      },
+      "previous_hash": "684ec8a5f86762c4037fdaf59c14d02623d7fbe09f4591b726df226daf2a72ad",
+      "current_hash": "f57dabe9cec63a1c53891878fc4d52e9848744f376bb1e3b6e2d940d3e089c85"
+    },
+    {
+      "id": "1ce08c00-69db-4b3c-9081-151be55b0ad1",
+      "timestamp": "2026-07-25T17:32:12.847Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "find /Users/ap/Documents/Codex/2026-07-19/build/.claude -type f 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "f57dabe9cec63a1c53891878fc4d52e9848744f376bb1e3b6e2d940d3e089c85",
+      "current_hash": "718d18fc268d92e5d55a5f2fab66f930b24f6b220fcfd8bfb5d8033c0d4ac944"
+    },
+    {
+      "id": "78c51f96-daed-4d3c-8042-7f3c7684e34c",
+      "timestamp": "2026-07-25T17:32:13.543Z",
+      "type": "FILE_READ",
+      "payload": {
+        "path": "/Users/ap/Documents/Codex/2026-07-19/build/docs/claude-code-hooks.md"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Read"
+      },
+      "previous_hash": "718d18fc268d92e5d55a5f2fab66f930b24f6b220fcfd8bfb5d8033c0d4ac944",
+      "current_hash": "45a3a96e6ae1f4a570032c72aefe79c8f85673092f529e1f56b69f5dcc027cea"
+    },
+    {
+      "id": "a4651b9e-46b0-480d-828f-6847da510842",
+      "timestamp": "2026-07-25T17:32:14.268Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "find /Users/ap/Documents/Codex/2026-07-19/build/.claude -type f 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "45a3a96e6ae1f4a570032c72aefe79c8f85673092f529e1f56b69f5dcc027cea",
+      "current_hash": "562b9fff840886399fce652c1a3820e4ef7c92caa6ec71ba5c572ba50a246739"
+    },
+    {
+      "id": "ce9ab34f-1fb4-4093-8e9c-fa075c8a0513",
+      "timestamp": "2026-07-25T17:32:14.276Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "/Users/ap/Documents/Codex/2026-07-19/build/.claude/settings.json\n/Users/ap/Documents/Codex/2026-07-19/build/.claude/settings.local.json"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "562b9fff840886399fce652c1a3820e4ef7c92caa6ec71ba5c572ba50a246739",
+      "current_hash": "02659fab6a9e1bb8d1a5148b87380f2e4f9c7e2b02264566b7543cd502df6196"
+    },
+    {
+      "id": "dbf88feb-59a3-49ff-951e-e647d034aaef",
+      "timestamp": "2026-07-25T17:32:17.655Z",
+      "type": "FILE_READ",
+      "payload": {
+        "path": "/Users/ap/Documents/Codex/2026-07-19/build/.claude/settings.json"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Read"
+      },
+      "previous_hash": "02659fab6a9e1bb8d1a5148b87380f2e4f9c7e2b02264566b7543cd502df6196",
+      "current_hash": "cdcecb4760a6892025f9e1abf64b191e936c4d89092b27046225e0a2a7e5caa7"
+    },
+    {
+      "id": "393f3098-bf47-470c-86f2-650a3eb5ccfd",
+      "timestamp": "2026-07-25T17:32:17.804Z",
+      "type": "FILE_READ",
+      "payload": {
+        "path": "/Users/ap/Documents/Codex/2026-07-19/build/bin/glasshouse-claude-hook.mjs"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Read"
+      },
+      "previous_hash": "cdcecb4760a6892025f9e1abf64b191e936c4d89092b27046225e0a2a7e5caa7",
+      "current_hash": "30b307acc1324e42d08e8bc7775550f1a43933aa9af206b06288a76c6f0f2b8a"
+    },
+    {
+      "id": "6baf7b3a-7d50-4ae8-aeaf-9338b2cc525b",
+      "timestamp": "2026-07-25T17:32:27.242Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "outcome": "success"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "Stop"
+      },
+      "previous_hash": "30b307acc1324e42d08e8bc7775550f1a43933aa9af206b06288a76c6f0f2b8a",
+      "current_hash": "d2bbcd834f3bf090142ca3f89be030556827d7d746c7fc4eecd0c76d6902d49d"
+    }
+  ],
+  "finishedAt": "2026-07-25T17:32:27.247Z"
+}

@@ -1,0 +1,70 @@
+{
+  "id": "355e0152-b2e4-496a-902e-778b2c5202ce",
+  "agent": "claude-code",
+  "title": "build",
+  "startedAt": "2026-07-24T16:32:42.233Z",
+  "events": [
+    {
+      "id": "7959e840-0e03-4d4c-bcc9-0709ab335d1b",
+      "timestamp": "2026-07-24T16:32:42.237Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "python3 -m json.tool /Users/ap/Documents/Codex/2026-07-19/build/.claude/settings.json > /dev/null && echo \"valid JSON\"",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "547563b7a0d690adb23cd6230600dc7f9dd1c11ef51f859a54ba749a89ead0a8"
+    },
+    {
+      "id": "d407b263-8828-4537-b32e-2cace4a3f7b2",
+      "timestamp": "2026-07-24T16:32:42.417Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "python3 -m json.tool /Users/ap/Documents/Codex/2026-07-19/build/.claude/settings.json > /dev/null && echo \"valid JSON\"",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "547563b7a0d690adb23cd6230600dc7f9dd1c11ef51f859a54ba749a89ead0a8",
+      "current_hash": "830bee76d18997c5f5f926d914b7d888a19096bdbbf34a41607bd7c838f3674d"
+    },
+    {
+      "id": "ab35ae97-a072-434c-b609-724b5343432a",
+      "timestamp": "2026-07-24T16:32:42.424Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "valid JSON"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "830bee76d18997c5f5f926d914b7d888a19096bdbbf34a41607bd7c838f3674d",
+      "current_hash": "8f70e81ec05a36bcaf8ad2f89844a90fff886a3548ab764aa5e8b869509ffd5f"
+    },
+    {
+      "id": "13896022-0db9-4463-b8b3-11f919ed62e2",
+      "timestamp": "2026-07-24T16:32:46.019Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "outcome": "success"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "Stop"
+      },
+      "previous_hash": "8f70e81ec05a36bcaf8ad2f89844a90fff886a3548ab764aa5e8b869509ffd5f",
+      "current_hash": "a16e347dbb2b00a23af5192b71adf96088bc13e65a6db51de9397b3c9369018f"
+    }
+  ],
+  "finishedAt": "2026-07-24T16:32:46.021Z"
+}

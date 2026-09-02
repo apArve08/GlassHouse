@@ -1,0 +1,9 @@
+{
+  "hooks": {
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "node /Users/ap/Documents/Codex/2026-07-19/build/bin/glasshouse-claude-hook.mjs" }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "node /Users/ap/Documents/Codex/2026-07-19/build/bin/glasshouse-claude-hook.mjs" }] }],
+    "PreToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node /Users/ap/Documents/Codex/2026-07-19/build/bin/glasshouse-claude-hook.mjs" }] }],
+    "PostToolUse": [{ "matcher": "*", "hooks": [{ "type": "command", "command": "node /Users/ap/Documents/Codex/2026-07-19/build/bin/glasshouse-claude-hook.mjs" }] }],
+    "Stop": [{ "hooks": [{ "type": "command", "command": "node /Users/ap/Documents/Codex/2026-07-19/build/bin/glasshouse-claude-hook.mjs" }] }]
+  }
+}

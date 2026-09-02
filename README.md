@@ -43,7 +43,7 @@ Event types live in `@glasshouse/core`: `SESSION_STARTED`, `USER_PROMPT`, `ASSIS
 | Agent | Status | Mechanism |
 | --- | --- | --- |
 | Codex CLI | Working | Wrapper around `codex exec --json` |
-| Claude Code | Planned | `settings.json` hooks, or transcript import |
+| Claude Code | Working | `settings.json` hooks (`PreToolUse`/`PostToolUse`/`SessionStart`/`Stop`) |
 | Gemini CLI, OpenCode, custom | Planned | `AgentAdapter` contract |
 
 The session format is agent-neutral: `Session.agent` is a plain string and the event types are not tied to any vendor. Any recorder that emits a valid chain replays in the same viewer with no changes.
@@ -76,6 +76,16 @@ CODEX_BIN="$(command -v codex)" pnpm record:codex -- --cd /path/to/your/project 
 The wrapper runs `codex exec --json`, records allowed observable events, **ignores `reasoning` events**, and writes a tamper-evident session to `storage/sessions`. Refresh the web app afterwards and the session appears in the sidebar.
 
 See [the Codex-first guide](docs/codex-first.md) and [Using Codex 5.6 with Glasshouse-lite](docs/using-codex-5-6.md) for the full workflow.
+
+## Recording a Claude Code session
+
+Unlike the Codex wrapper, Claude Code recording is passive: register
+`bin/glasshouse-claude-hook.mjs` once in a project's `.claude/settings.json`
+hooks, and every session in that project records itself from then on, no
+per-invocation command needed.
+
+See [the Claude Code hooks guide](docs/claude-code-hooks.md) for the settings
+snippet and a table of exactly which hook events and tools get recorded.
 
 ## Self-contained replay files
 
@@ -119,6 +129,8 @@ The Next.js dashboard is **not** deployable as-is. Its API reads and writes `sto
 apps/web             Next.js replay dashboard (local development)
 bin/                 Recorder and HTML build CLIs
 packages/core        Event, session, and adapter contracts
+packages/codex-adapter    Codex `exec --json` event normalization
+packages/claude-adapter   Claude Code hook event normalization
 packages/hash        Canonical SHA-256 chain + verification
 packages/sdk         Small recording API for agent integrations
 packages/replay      Time-to-event replay helpers
@@ -162,7 +174,10 @@ Because replay is fully client-side, session contents stay on the reviewer's mac
 
 ## Roadmap
 
-- Claude Code adapter via `settings.json` hooks
+- Gemini CLI adapter via `.gemini/settings.json` `BeforeTool`/`AfterTool` hooks
+- File-write fallback (git-diff watch) for agents whose hooks don't cover every write, e.g. Codex's `apply_patch`
+- `glasshouse watch` — terminal tail of a session as it records, ahead of a full TUI
+- `glasshouse serve` — localhost WebSocket live view feeding the existing replay viewer, instead of only post-hoc HTML export
 - Append-only SQLite/Postgres and signed session exports
 - Monaco-powered full file diff, artifact snapshots, and search
 - Team session sharing, retention policy, and compliance export

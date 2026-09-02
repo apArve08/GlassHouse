@@ -1,0 +1,23 @@
+{
+  "id": "7d674635-eda1-4d45-8262-b4dbf8c71666",
+  "agent": "claude-code",
+  "title": "build",
+  "startedAt": "2026-07-24T16:33:32.455Z",
+  "events": [
+    {
+      "id": "8e0106a2-f185-4a3d-a37c-3ded81ab9ea4",
+      "timestamp": "2026-07-24T16:33:32.460Z",
+      "type": "SESSION_STARTED",
+      "payload": {
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build",
+        "source": "startup"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "SessionStart"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "8aa5914de6549a6ae536b3c0e37e22c81734adf796e76a4af17c15b716b55c32"
+    }
+  ]
+}

@@ -1,0 +1,456 @@
+{
+  "id": "c0d85437-836e-4866-b01a-410d570bc7ba",
+  "agent": "claude-code",
+  "title": "build",
+  "startedAt": "2026-07-29T13:49:17.378Z",
+  "events": [
+    {
+      "id": "50818299-8e22-425a-879f-638323750492",
+      "timestamp": "2026-07-29T13:49:17.384Z",
+      "type": "SESSION_STARTED",
+      "payload": {
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build",
+        "source": "startup"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "SessionStart"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "1f8e706255352d9485a66393c7c45d90bb2c205cd0f5c791fe3a43d08b50c69e"
+    },
+    {
+      "id": "7ec3094d-3c3f-4cae-a6c9-8a1dc0dbdc48",
+      "timestamp": "2026-07-29T13:49:51.707Z",
+      "type": "USER_PROMPT",
+      "payload": {
+        "text": "what is the current functions and achievement for this program"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "UserPromptSubmit"
+      },
+      "previous_hash": "1f8e706255352d9485a66393c7c45d90bb2c205cd0f5c791fe3a43d08b50c69e",
+      "current_hash": "027e6bd9454fb92b936078237528d120f8a0673a5ad72280326fd6f3c8a14a94"
+    },
+    {
+      "id": "52ba3890-7691-4f82-be41-a1e2a52b813d",
+      "timestamp": "2026-07-29T13:49:55.120Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "cat README.md",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "027e6bd9454fb92b936078237528d120f8a0673a5ad72280326fd6f3c8a14a94",
+      "current_hash": "ca4dcebba283cf32841b364db8d2cda26f5fe06cd828b76a813e1b1c77990f31"
+    },
+    {
+      "id": "3e2c30b6-89f7-4ddc-b634-1ce904ca047c",
+      "timestamp": "2026-07-29T13:49:55.981Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "ls -la && echo \"---\" && cat package.json 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "ca4dcebba283cf32841b364db8d2cda26f5fe06cd828b76a813e1b1c77990f31",
+      "current_hash": "b9816aef635af669d4d3ab54241cb51624e4787f77862c04ddb00bf1ab341658"
+    },
+    {
+      "id": "04f5885f-98a0-4192-9185-c7cfafc28115",
+      "timestamp": "2026-07-29T13:49:56.741Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "cat README.md",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "b9816aef635af669d4d3ab54241cb51624e4787f77862c04ddb00bf1ab341658",
+      "current_hash": "1fe86635f84846db848f450bf0b814fb2783118bc32e3f7c8592252765e5a68d"
+    },
+    {
+      "id": "83805f8a-3702-49d9-a0de-766f958c6d2e",
+      "timestamp": "2026-07-29T13:49:56.748Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "# Glasshouse-lite\n\n**A flight recorder for coding AI agents.** Glasshouse records what an agent actually did during a coding session, cryptographically links every event into a tamper-evident chain, and replays the whole thing in a visual inspector. It records observable actions only — never hidden reasoning.\n\n## The problem\n\nAn AI coding agent edits your files, runs your commands, and changes your repository, usually faster than anyone reads along. Afterwards you are left with a diff and a claim about how it got there. If something is wrong — a weakened validation check, a deleted test, a command nobody expected — there is no record of when it happened or what the agent was reacting to.\n\nCode review shows you the destination. Glasshouse shows you the route.\n\nWhen an agent reads a file, writes an edit, runs a command, or emits output, those are observable operational events. Glasshouse captures that stream as an immutable, inspectable session timeline: a black box for AI coding work.\n\n## How it works\n\nRecording happens on your machine; replay happens anywhere.\n\n```text\nYour computer                                Anywhere\n─────────────────────────────                ──────────────────────\nglasshouse recorder                          replay viewer\n  wraps or hooks the agent                     timeline + diffs\n  translates its events        ──session──▶    hash verification\n  hash-chains each one           JSON/HTML     no server required\n  writes storage/sessions/\n```\n\nThe recorder must be local — it observes a CLI agent running against your files, which no hosted service can do for you. The viewer is a static page with no backend, so a session can be replayed from a file, a link, or an email attachment without anything being uploaded.\n\n### The event chain\n\nEach event carries an ID, timestamp, type, payload, optional duration and metadata, plus `previous_hash` and `current_hash`:\n\n```\ncurrent_hash = SHA256(previous_hash + timestamp + canonicalized_payload)\n```\n\nBecause every hash commits to its predecessor, editing one event invalidates it *and* every link after it. Deleting or reordering events breaks the chain too. Verification recomputes the whole chain and reports exactly which events failed.\n\nEvent types live in `@glasshouse/core`: `SESSION_STARTED`, `USER_PROMPT`, `ASSISTANT_MESSAGE`, `FILE_READ`, `FILE_WRITE`, `COMMAND_STARTED`, `COMMAND_FINISHED`, `STDOUT`, `STDERR`, `TEST_STARTED`, `TEST_FINISHED`, `DIFF_CREATED`, `SESSION_FINISHED`.\n\n## Agent support\n\n| Agent | Status | Mechanism |\n| --- | --- | --- |\n| Codex CLI | Working | Wrapper around `codex exec --json` |\n| Claude Code | Working | `settings.json` hooks (`PreToolUse`/`PostToolUse`/`SessionStart`/`Stop`) |\n| Gemini CLI, OpenCode, custom | Planned | `AgentAdapter` contract |\n\nThe session format is agent-neutral: `Session.agent` is a plain string and the event types are not tied to any vendor. Any recorder that emits a valid chain replays in the same viewer with no changes.\n\nNote the two integration shapes differ in feel. A wrapper is opt-in — you launch the agent *through* Glasshouse. Hooks are passive — you register them once and every session records itself. Passive capture is the better fit for a flight recorder, which is why Claude Code support is the priority.\n\n## Quick start\n\n```bash\npnpm install\npnpm dev\n```\n\nOpen `http://localhost:3000` and press **Load demo session**. Select timeline events to inspect payloads, diffs, metadata, and their cryptographic links. Press **Tamper session** to mutate a `FILE_WRITE` payload: chain verification immediately turns red and the corrupted event is highlighted.\n\n## Recording a Codex session\n\n```bash\npnpm record:codex -- --cd /path/to/your/project -- \"Fix the failing validation test\"\n```\n\nUse `--cd` to point at the project you want Codex to edit; the wrapper adds Codex's non-Git-project flag automatically when that directory has no `.git`. Add `--model` to choose a model, and `--html` to emit a replay page alongside the JSON.\n\nIf Codex cannot be found, install it with `npm install -g @openai/codex`, or point Glasshouse at a nonstandard location:\n\n```bash\nCODEX_BIN=\"$(command -v codex)\" pnpm record:codex -- --cd /path/to/your/project -- \"Fix the failing test\"\n```\n\nThe wrapper runs `codex exec --json`, records allowed observable events, **ignores `reasoning` events**, and writes a tamper-evident session to `storage/sessions`. Refresh the web app afterwards and the session appears in the sidebar.\n\nSee [the Codex-first guide](docs/codex-first.md) and [Using Codex 5.6 with Glasshouse-lite](docs/using-codex-5-6.md) for the full workflow.\n\n## Recording a Claude Code session\n\nUnlike the Codex wrapper, Claude Code recording is passive: register\n`bin/glasshouse-claude-hook.mjs` once in a project's `.claude/settings.json`\nhooks, and every session in that project records itself from then on, no\nper-invocation command needed.\n\nSee [the Claude Code hooks guide](docs/claude-code-hooks.md) for the settings\nsnippet and a table of exactly which hook events and tools get recorded.\n\n## Self-contained replay files\n\nAny session can be emitted as a single HTML file containing both the data and the viewer. No dependencies, no network requests, no server — open it in a browser, attach it to a pull request, or send it to a reviewer.\n\n```bash\n# Record and emit the replay file in one step\npnpm record:codex -- --cd /path/to/your/project --html -- \"Fix the failing test\"\n\n# Convert a session recorded earlier\npnpm session:html storage/sessions/<id>.json\n\n# Build the empty viewer, which accepts any session dropped onto it\npnpm build:viewer\n```\n\nVerification runs inside the page: the chain is recomputed from the embedded events on load, so a modified file reports **HASH VERIFICATION FAILED** and highlights the offending event. A typical session is around 35 KB; the viewer alone is 29 KB.\n\nThis is the distribution path. The Next.js dashboard stays the local development surface, since it watches `storage/sessions` and lists recordings as they appear.\n\n## Hosting the viewer\n\n`vercel.json` deploys the standalone viewer as a static site. Visitors drop a session file onto the page and it replays entirely client-side — **sessions are never uploaded**, which is what makes a public viewer safe.\n\n```bash\nvercel --prod\n```\n\nTwo things to know:\n\n- **Root Directory must be the repository root** in your Vercel project settings. If it points at `apps/web`, the build runs in the wrong directory and cannot find `bin/`.\n- **Install is skipped deliberately.** The viewer has zero dependencies, and skipping install sidesteps the lockfile drift described under Known issues.\n\nTo publish a specific session at a permanent URL, generate it into `site/` before deploying (`pnpm session:html <session>.json site/demo.html` → `/demo`). `site/` is gitignored so this is opt-in per file. Treat anything placed there as public: sessions embed real diffs and command output.\n\nThe Next.js dashboard is **not** deployable as-is. Its API reads and writes `storage/sessions` on the local filesystem, which does not survive on serverless hosting. Multi-user hosting needs a database and authentication — see Roadmap.\n\n## Repository layout\n\n```text\napps/web             Next.js replay dashboard (local development)\nbin/                 Recorder and HTML build CLIs\npackages/core        Event, session, and adapter contracts\npackages/codex-adapter    Codex `exec --json` event normalization\npackages/claude-adapter   Claude Code hook event normalization\npackages/hash        Canonical SHA-256 chain + verification\npackages/sdk         Small recording API for agent integrations\npackages/replay      Time-to-event replay helpers\npackages/viewer      Self-contained single-file HTML replay build\npackages/ui          Future shared UI primitives\nstorage/sessions     Recorded sessions\n```\n\n## SDK\n\nFor instrumenting your own agent:\n\n```ts\nimport { glasshouse } from \"@glasshouse/sdk\";\n\nawait glasshouse.startSession(\"codex-cli\");\nawait glasshouse.record({\n  type: \"FILE_WRITE\",\n  payload: { path: \"src/auth.ts\", before: \"...\", after: \"...\" }\n});\nawait glasshouse.finish();\nconst integrity = await glasshouse.verify();\nconst archive = glasshouse.export();\n```\n\n`AgentAdapter` in `@glasshouse/core` gives every integration a consistent start/stop/event surface. An adapter's only job is translating observable agent hooks into Glasshouse events.\n\n## Security model\n\nGlasshouse records only observable events supplied by the host agent. Do not record hidden reasoning, private prompts outside the chosen policy, secrets, or raw environment variables.\n\nHash chaining provides **tamper evidence, not tamper proofing**. It reliably detects edits, deletions, and reordering of an existing session. It does not stop someone from forging an entirely new, internally consistent chain — that requires signing sessions at the recorder and storing them append-only, which is on the roadmap. Until then, treat a verified chain as evidence the file has not been altered since recording, not as proof of who recorded it.\n\nBecause replay is fully client-side, session contents stay on the reviewer's machine. Publishing a session to a public URL is the one action that changes this; do it deliberately.\n\n## Known issues\n\n- `pnpm install --frozen-lockfile` fails: `packages/codex-adapter/package.json` declares `@glasshouse/core` but `pnpm-lock.yaml` has no entry for it. CI defaults to frozen, so any build needing dependencies will break until the lockfile is regenerated.\n- `pnpm-lock.yaml` was generated by pnpm 10 while `package.json` pins `pnpm@9.15.0`.\n- The viewer implements SHA-256 in plain JavaScript rather than using `crypto.subtle`, so verification works offline from `file://` without a secure context. It is verified against Node's `crypto`, but **it must stay in sync with `packages/hash`** — changing the canonicalization or hash formula means changing both.\n\n## Roadmap\n\n- Gemini CLI adapter via `.gemini/settings.json` `BeforeTool`/`AfterTool` hooks\n- File-write fallback (git-diff watch) for agents whose hooks don't cover every write, e.g. Codex's `apply_patch`\n- `glasshouse watch` — terminal tail of a session as it records, ahead of a full TUI\n- `glasshouse serve` — localhost WebSocket live view feeding the existing replay viewer, instead of only post-hoc HTML export\n- Append-only SQLite/Postgres and signed session exports\n- Monaco-powered full file diff, artifact snapshots, and search\n- Team session sharing, retention policy, and compliance export\n- Adapter registry and OpenTelemetry bridge\n- Secret redaction before a session is written\n\n## Demo script (three minutes)\n\n1. Introduce Glasshouse as the black box for coding agents: it captures actions, not private reasoning.\n2. Load a session and play the timeline: prompt → file read → code edit → failed test → retry → passing tests.\n3. Open the file-write event and show the captured unified diff and its hashes.\n4. Press **Tamper session**. The status becomes **HASH VERIFICATION FAILED** and the edit is visibly marked.\n5. Explain that adapters only need to translate observable agent hooks into events."
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "1fe86635f84846db848f450bf0b814fb2783118bc32e3f7c8592252765e5a68d",
+      "current_hash": "cf71bcc346430f0073faead020bf58a9d17bf1e7221ba4ea8af2e71b6b738194"
+    },
+    {
+      "id": "ca5fab45-d3be-484d-845b-45f54e72e473",
+      "timestamp": "2026-07-29T13:49:56.809Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "ls -la && echo \"---\" && cat package.json 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "cf71bcc346430f0073faead020bf58a9d17bf1e7221ba4ea8af2e71b6b738194",
+      "current_hash": "93f7e55bd04a1d313e5a1ffce432267d62110238cec3c4164a7941c5db75b0d4"
+    },
+    {
+      "id": "7d44f1c3-c0c0-421a-aaa2-deee5a64ab5c",
+      "timestamp": "2026-07-29T13:49:56.817Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "total 112\ndrwxr-xr-x@ 20 ap  staff    640 Jul 21 23:15 .\ndrwxr-xr-x@  3 ap  staff     96 Jul 19 22:04 ..\ndrwxr-xr-x@  4 ap  staff    128 Jul 25 00:32 .claude\ndrwxr-xr-x@ 14 ap  staff    448 Jul 21 23:20 .git\n-rw-r--r--@  1 ap  staff     58 Jul 21 00:34 .gitignore\ndrwxr-xr-x@  3 ap  staff     96 Jul 21 00:41 .vscode\ndrwxr-xr-x@  3 ap  staff     96 Jul 19 23:41 apps\ndrwxr-xr-x@  5 ap  staff    160 Jul 21 23:08 bin\ndrwxr-xr-x@  5 ap  staff    160 Jul 21 23:10 docs\ndrwxr-xr-x@  6 ap  staff    192 Jul 21 23:15 node_modules\ndrwxr-xr-x@  2 ap  staff     64 Jul 19 22:04 outputs\n-rw-r--r--@  1 ap  staff    591 Jul 21 00:34 package.json\ndrwxr-xr-x@ 10 ap  staff    320 Jul 21 22:52 packages\n-rw-r--r--@  1 ap  staff  21307 Jul 21 23:15 pnpm-lock.yaml\n-rw-r--r--@  1 ap  staff     36 Jul 19 23:39 pnpm-workspace.yaml\n-rw-r--r--@  1 ap  wheel  11280 Jul 21 23:14 README.md\ndrwxr-xr-x@  4 ap  staff    128 Jul 20 00:26 storage\n-rw-r--r--@  1 ap  staff    260 Jul 19 23:39 tsconfig.base.json\n-rw-r--r--@  1 ap  staff    722 Jul 21 00:34 vercel.json\ndrwxr-xr-x@  2 ap  staff     64 Jul 19 22:04 work\n---\n{\n  \"name\": \"glasshouse-lite\",\n  \"private\": true,\n  \"packageManager\": \"pnpm@9.15.0\",\n  \"scripts\": {\n    \"dev\": \"pnpm --filter @glasshouse/web dev\",\n    \"build\": \"pnpm --filter @glasshouse/web build\",\n    \"typecheck\": \"pnpm --filter @glasshouse/web typecheck\",\n    \"record:codex\": \"node ./bin/glasshouse-codex.mjs\",\n    \"session:html\": \"node ./bin/glasshouse-html.mjs\",\n    \"build:viewer\": \"node ./bin/glasshouse-html.mjs --viewer outputs/glasshouse.html\",\n    \"build:site\": \"node bin/glasshouse-html.mjs --viewer site/index.html\"\n  },\n  \"devDependencies\": {\n    \"typescript\": \"^5.7.3\"\n  }\n}"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "93f7e55bd04a1d313e5a1ffce432267d62110238cec3c4164a7941c5db75b0d4",
+      "current_hash": "75d91ccf804a7ff7665e1f31250147027966def254358d392dfe89f952207110"
+    },
+    {
+      "id": "068f1e9a-8d37-45cc-bf57-02d838065404",
+      "timestamp": "2026-07-29T13:50:01.748Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "git log --oneline -20 && echo \"---STATUS---\" && git status && echo \"---DIFF STAT---\" && git diff --stat",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "75d91ccf804a7ff7665e1f31250147027966def254358d392dfe89f952207110",
+      "current_hash": "89fa980d9e010e24aec978982e2eb1c90875997a1fbf210f26363c2ef2d678e7"
+    },
+    {
+      "id": "0207f45e-b415-486f-83e2-d04eeb50e83c",
+      "timestamp": "2026-07-29T13:50:01.885Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "git log --oneline -20 && echo \"---STATUS---\" && git status && echo \"---DIFF STAT---\" && git diff --stat",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "89fa980d9e010e24aec978982e2eb1c90875997a1fbf210f26363c2ef2d678e7",
+      "current_hash": "fd01db83831c415274ee710d583b2f212a0d2c349dc673d883d9f3a12397728a"
+    },
+    {
+      "id": "9e700abb-2892-4d07-a467-f20f35b53eff",
+      "timestamp": "2026-07-29T13:50:01.892Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "382cc37 v2.1\n69b8b88 v2\nfe5a82b GlassHouse v1\n---STATUS---\nOn branch main\nYour branch is up to date with 'origin/main'.\n\nChanges not staged for commit:\n  (use \"git add <file>...\" to update what will be committed)\n  (use \"git restore <file>...\" to discard changes in working directory)\n\tmodified:   README.md\n\tmodified:   pnpm-lock.yaml\n\nUntracked files:\n  (use \"git add <file>...\" to include in what will be committed)\n\t.claude/\n\tbin/glasshouse-claude-hook.mjs\n\tdocs/claude-code-hooks.md\n\tpackages/claude-adapter/\n\tstorage/sessions/08208afc-9c03-47e4-9852-8db44260baf3.json\n\tstorage/sessions/355e0152-b2e4-496a-902e-778b2c5202ce.json\n\tstorage/sessions/7d674635-eda1-4d45-8262-b4dbf8c71666.json\n\tstorage/sessions/b80e4c9a-d8f5-4c23-8011-0964f9761e30.json\n\tstorage/sessions/c0d85437-836e-4866-b01a-410d570bc7ba.json\n\nno changes added to commit (use \"git add\" and/or \"git commit -a\")\n---DIFF STAT---\n README.md      | 19 +++++++++++++++++--\n pnpm-lock.yaml | 14 ++++++++++++++\n 2 files changed, 31 insertions(+), 2 deletions(-)"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "fd01db83831c415274ee710d583b2f212a0d2c349dc673d883d9f3a12397728a",
+      "current_hash": "05ad53825c46deead1cf62f308d1ef13735dd3c2b939810d192e7a666249be1c"
+    },
+    {
+      "id": "3ce152b9-63c7-4880-9da0-d05c412cdff6",
+      "timestamp": "2026-07-29T13:50:02.142Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "find packages -maxdepth 2 -type d | sort && echo \"---\" && ls packages/claude-adapter 2>/dev/null && echo \"---\" && cat packages/claude-adapter/package.json 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "05ad53825c46deead1cf62f308d1ef13735dd3c2b939810d192e7a666249be1c",
+      "current_hash": "a0a040978b6ff345356352f01ea815fea74f8e67870fab0ef3bdbe82df2f3312"
+    },
+    {
+      "id": "7b86103d-f2e5-4b55-be3f-a27fd283c777",
+      "timestamp": "2026-07-29T13:50:02.249Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "find packages -maxdepth 2 -type d | sort && echo \"---\" && ls packages/claude-adapter 2>/dev/null && echo \"---\" && cat packages/claude-adapter/package.json 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "a0a040978b6ff345356352f01ea815fea74f8e67870fab0ef3bdbe82df2f3312",
+      "current_hash": "8713d6f58f1732e5109554b8c1c574eec4d690d7bc0ece6b86ffe7c76e31b863"
+    },
+    {
+      "id": "b4062c5a-721d-42b9-b07c-a932d1ea54a7",
+      "timestamp": "2026-07-29T13:50:02.258Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "packages\npackages/claude-adapter\npackages/claude-adapter/node_modules\npackages/claude-adapter/src\npackages/codex-adapter\npackages/codex-adapter/node_modules\npackages/codex-adapter/src\npackages/core\npackages/core/src\npackages/hash\npackages/hash/node_modules\npackages/hash/src\npackages/replay\npackages/replay/node_modules\npackages/replay/src\npackages/sdk\npackages/sdk/node_modules\npackages/sdk/src\npackages/ui\npackages/ui/src\npackages/viewer\npackages/viewer/src\n---\nnode_modules\npackage.json\nsrc\n---\n{\"name\":\"@glasshouse/claude-adapter\",\"version\":\"0.1.0\",\"private\":true,\"type\":\"module\",\"exports\":\"./src/index.ts\",\"dependencies\":{\"@glasshouse/core\":\"workspace:*\"}}"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "8713d6f58f1732e5109554b8c1c574eec4d690d7bc0ece6b86ffe7c76e31b863",
+      "current_hash": "149218f7aa26c9161842dbeb6878c371a1ad0ebefe00062f91d22759655f9452"
+    },
+    {
+      "id": "76796679-619e-4df3-99ae-340da85bd329",
+      "timestamp": "2026-07-29T13:50:13.469Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "outcome": "success"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "Stop"
+      },
+      "previous_hash": "149218f7aa26c9161842dbeb6878c371a1ad0ebefe00062f91d22759655f9452",
+      "current_hash": "ed1dc3edf72a3a33f2e0e85ddac1d08998ffd3a0e546aded739ede859eacb148"
+    },
+    {
+      "id": "394e4986-27a2-4f87-babb-55b19f0bfb40",
+      "timestamp": "2026-07-29T13:51:51.045Z",
+      "type": "USER_PROMPT",
+      "payload": {
+        "text": "what can i improve or add"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "UserPromptSubmit"
+      },
+      "previous_hash": "ed1dc3edf72a3a33f2e0e85ddac1d08998ffd3a0e546aded739ede859eacb148",
+      "current_hash": "f35969656ddedb6e57aa704eef47ac959d5fb3f18598fac3201b84362a6dafa3"
+    },
+    {
+      "id": "385879c3-b7e6-4d85-918d-62fb466d54dc",
+      "timestamp": "2026-07-29T13:51:58.952Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "find packages/claude-adapter/src -type f && echo \"---HOOK---\" && wc -l bin/glasshouse-claude-hook.mjs bin/*.mjs 2>/dev/null && echo \"---TESTS---\" && find . -path ./node_modules -prune -o -iname \"*.test.*\" -print -o -iname \"*.spec.*\" -print 2>/dev/null | grep -v node_modules && echo \"---CI---\" && find . -path ./node_modules -prune -o -path \"*.github*\" -print 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "f35969656ddedb6e57aa704eef47ac959d5fb3f18598fac3201b84362a6dafa3",
+      "current_hash": "38da84eeb75a3211a529d7b953d0bd4e879876daacb559ac6be2d71c890cbffd"
+    },
+    {
+      "id": "bdf02ebc-e3e1-40c6-b4fe-326c84b73bb5",
+      "timestamp": "2026-07-29T13:51:59.117Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "find packages/claude-adapter/src -type f && echo \"---HOOK---\" && wc -l bin/glasshouse-claude-hook.mjs bin/*.mjs 2>/dev/null && echo \"---TESTS---\" && find . -path ./node_modules -prune -o -iname \"*.test.*\" -print -o -iname \"*.spec.*\" -print 2>/dev/null | grep -v node_modules && echo \"---CI---\" && find . -path ./node_modules -prune -o -path \"*.github*\" -print 2>/dev/null",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "38da84eeb75a3211a529d7b953d0bd4e879876daacb559ac6be2d71c890cbffd",
+      "current_hash": "2ecbd71656a852227cd55e9318bf00e87d5cece505bffc8bf62f69812182dd73"
+    },
+    {
+      "id": "bacc88e2-0fb4-423a-beca-951626f34978",
+      "timestamp": "2026-07-29T13:51:59.124Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "packages/claude-adapter/src/index.ts\n---HOOK---\n     139 bin/glasshouse-claude-hook.mjs\n     139 bin/glasshouse-claude-hook.mjs\n     114 bin/glasshouse-codex.mjs\n      35 bin/glasshouse-html.mjs\n     427 total\n---TESTS---"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "2ecbd71656a852227cd55e9318bf00e87d5cece505bffc8bf62f69812182dd73",
+      "current_hash": "22cda6d1d873d6dd0b2f3ccc54c5136bb3accd3007a8ff3da67c718aad53f6fa"
+    },
+    {
+      "id": "1bd4ebc8-f113-4185-b97d-3e139288cf20",
+      "timestamp": "2026-07-29T13:51:59.458Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "cat packages/hash/src/*.ts 2>/dev/null | head -100",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "22cda6d1d873d6dd0b2f3ccc54c5136bb3accd3007a8ff3da67c718aad53f6fa",
+      "current_hash": "de83ddee8a92d5a0728261dc3e538fd450f40ff4e1a6644f160a335665f01eb6"
+    },
+    {
+      "id": "c732e741-29b5-4fea-9b78-b6bdafde260e",
+      "timestamp": "2026-07-29T13:51:59.549Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "cat packages/hash/src/*.ts 2>/dev/null | head -100",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "de83ddee8a92d5a0728261dc3e538fd450f40ff4e1a6644f160a335665f01eb6",
+      "current_hash": "154d8b8d0b73ee2b963dc99ebfa7e5f8c5b067556c68c2d8a60182d8b98c0dd6"
+    },
+    {
+      "id": "184ebad4-db53-4c83-bf09-be0d21c0aea4",
+      "timestamp": "2026-07-29T13:51:59.555Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "import type { GlasshouseEvent, JsonObject, JsonValue, VerificationResult } from \"@glasshouse/core\";\n\nexport const GENESIS_HASH = \"GLASSHOUSE_GENESIS_V1\";\n\nexport function canonicalize(value: JsonObject): string {\n  return JSON.stringify(sortValue(value));\n}\n\nfunction sortValue(value: JsonValue): JsonValue {\n  if (Array.isArray(value)) return value.map(sortValue);\n  if (value !== null && typeof value === \"object\") {\n    return Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right)).map(([key, child]) => [key, sortValue(child)]));\n  }\n  return value;\n}\n\nexport async function sha256(input: string): Promise<string> {\n  const buffer = await crypto.subtle.digest(\"SHA-256\", new TextEncoder().encode(input));\n  return Array.from(new Uint8Array(buffer)).map((byte) => byte.toString(16).padStart(2, \"0\")).join(\"\");\n}\n\nexport async function eventHash(previousHash: string, timestamp: string, payload: JsonObject): Promise<string> {\n  return sha256(`${previousHash}${timestamp}${canonicalize(payload)}`);\n}\n\nexport async function verifyChain(events: GlasshouseEvent[]): Promise<VerificationResult> {\n  let previousHash = GENESIS_HASH;\n  const corruptedEventIds: string[] = [];\n  for (const event of events) {\n    const expected = await eventHash(previousHash, event.timestamp, event.payload);\n    if (event.previous_hash !== previousHash || event.current_hash !== expected) corruptedEventIds.push(event.id);\n    previousHash = event.current_hash;\n  }\n  return { valid: corruptedEventIds.length === 0, corruptedEventIds };\n}"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "154d8b8d0b73ee2b963dc99ebfa7e5f8c5b067556c68c2d8a60182d8b98c0dd6",
+      "current_hash": "23656642731e5da5ee06718ea4602e9e4701493355579c9651d3a67adfe3e073"
+    },
+    {
+      "id": "274ab660-cb9f-4e07-a2aa-9a5a55c969c4",
+      "timestamp": "2026-07-29T13:52:05.849Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "python3 -c \"\nimport json\nd = json.load(open('storage/sessions/c0d85437-836e-4866-b01a-410d570bc7ba.json'))\nprint(list(d.keys()))\nprint('agent:', d.get('agent'))\nprint('num events:', len(d.get('events', [])))\nprint('event types:', sorted(set(e['type'] for e in d.get('events', []))))\n\"\n",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "23656642731e5da5ee06718ea4602e9e4701493355579c9651d3a67adfe3e073",
+      "current_hash": "ad31b68b34747b0f4d8351e4498a28a153b04951585510708c3cf4c57b627863"
+    },
+    {
+      "id": "0a3275db-063c-4d9b-a900-4ea25288a111",
+      "timestamp": "2026-07-29T13:52:05.985Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "python3 -c \"\nimport json\nd = json.load(open('storage/sessions/c0d85437-836e-4866-b01a-410d570bc7ba.json'))\nprint(list(d.keys()))\nprint('agent:', d.get('agent'))\nprint('num events:', len(d.get('events', [])))\nprint('event types:', sorted(set(e['type'] for e in d.get('events', []))))\n\"\n",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "ad31b68b34747b0f4d8351e4498a28a153b04951585510708c3cf4c57b627863",
+      "current_hash": "984906633c94ddd8c3b29e960774e6990cba80b2f7786e1fbae43f262cfc644f"
+    },
+    {
+      "id": "dbaf14de-2c34-42de-8823-16850d639bc8",
+      "timestamp": "2026-07-29T13:52:05.992Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "['id', 'agent', 'title', 'startedAt', 'events', 'finishedAt']\nagent: claude-code\nnum events: 23\nevent types: ['COMMAND_FINISHED', 'COMMAND_STARTED', 'SESSION_FINISHED', 'SESSION_STARTED', 'STDOUT', 'USER_PROMPT']"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "984906633c94ddd8c3b29e960774e6990cba80b2f7786e1fbae43f262cfc644f",
+      "current_hash": "0b99f37665409baac84cb81ba468c9247bad411e59f4c30c35e318ab207406c2"
+    },
+    {
+      "id": "a20b51ae-d40a-4a7b-86a3-c71615346124",
+      "timestamp": "2026-07-29T13:52:06.416Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "grep -riE \"api[_-]?key|token|secret|password|AKIA|sk-ant|sk-proj\" storage/sessions/*.json | head -20",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PreToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "0b99f37665409baac84cb81ba468c9247bad411e59f4c30c35e318ab207406c2",
+      "current_hash": "05f2c64a5a8a5bb5229825c02e1a77976318c07d94002c3318578ce1e8d949be"
+    },
+    {
+      "id": "10f119bd-025a-49f9-b3c1-a765f8164084",
+      "timestamp": "2026-07-29T13:52:06.510Z",
+      "type": "COMMAND_FINISHED",
+      "payload": {
+        "command": "grep -riE \"api[_-]?key|token|secret|password|AKIA|sk-ant|sk-proj\" storage/sessions/*.json | head -20",
+        "cwd": "/Users/ap/Documents/Codex/2026-07-19/build"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "05f2c64a5a8a5bb5229825c02e1a77976318c07d94002c3318578ce1e8d949be",
+      "current_hash": "40974e82b098f1ce75f7ffe3d011aa26fb676a651767bbe98d1aabed96d6549f"
+    },
+    {
+      "id": "14d7bcbc-05fd-4762-a9f2-23ea3df625ec",
+      "timestamp": "2026-07-29T13:52:06.517Z",
+      "type": "STDOUT",
+      "payload": {
+        "output": "storage/sessions/c0d85437-836e-4866-b01a-410d570bc7ba.json:        \"output\": \"# Glasshouse-lite\\n\\n**A flight recorder for coding AI agents.** Glasshouse records what an agent actually did during a coding session, cryptographically links every event into a tamper-evident chain, and replays the whole thing in a visual inspector. It records observable actions only — never hidden reasoning.\\n\\n## The problem\\n\\nAn AI coding agent edits your files, runs your commands, and changes your repository, usually faster than anyone reads along. Afterwards you are left with a diff and a claim about how it got there. If something is wrong — a weakened validation check, a deleted test, a command nobody expected — there is no record of when it happened or what the agent was reacting to.\\n\\nCode review shows you the destination. Glasshouse shows you the route.\\n\\nWhen an agent reads a file, writes an edit, runs a command, or emits output, those are observable operational events. Glasshouse captures that stream as an immutable, inspectable session timeline: a black box for AI coding work.\\n\\n## How it works\\n\\nRecording happens on your machine; replay happens anywhere.\\n\\n```text\\nYour computer                                Anywhere\\n─────────────────────────────                ──────────────────────\\nglasshouse recorder                          replay viewer\\n  wraps or hooks the agent                     timeline + diffs\\n  translates its events        ──session──▶    hash verification\\n  hash-chains each one           JSON/HTML     no server required\\n  writes storage/sessions/\\n```\\n\\nThe recorder must be local — it observes a CLI agent running against your files, which no hosted service can do for you. The viewer is a static page with no backend, so a session can be replayed from a file, a link, or an email attachment without anything being uploaded.\\n\\n### The event chain\\n\\nEach event carries an ID, timestamp, type, payload, optional duration and metadata, plus `previous_hash` and `current_hash`:\\n\\n```\\ncurrent_hash = SHA256(previous_hash + timestamp + canonicalized_payload)\\n```\\n\\nBecause every hash commits to its predecessor, editing one event invalidates it *and* every link after it. Deleting or reordering events breaks the chain too. Verification recomputes the whole chain and reports exactly which events failed.\\n\\nEvent types live in `@glasshouse/core`: `SESSION_STARTED`, `USER_PROMPT`, `ASSISTANT_MESSAGE`, `FILE_READ`, `FILE_WRITE`, `COMMAND_STARTED`, `COMMAND_FINISHED`, `STDOUT`, `STDERR`, `TEST_STARTED`, `TEST_FINISHED`, `DIFF_CREATED`, `SESSION_FINISHED`.\\n\\n## Agent support\\n\\n| Agent | Status | Mechanism |\\n| --- | --- | --- |\\n| Codex CLI | Working | Wrapper around `codex exec --json` |\\n| Claude Code | Working | `settings.json` hooks (`PreToolUse`/`PostToolUse`/`SessionStart`/`Stop`) |\\n| Gemini CLI, OpenCode, custom | Planned | `AgentAdapter` contract |\\n\\nThe session format is agent-neutral: `Session.agent` is a plain string and the event types are not tied to any vendor. Any recorder that emits a valid chain replays in the same viewer with no changes.\\n\\nNote the two integration shapes differ in feel. A wrapper is opt-in — you launch the agent *through* Glasshouse. Hooks are passive — you register them once and every session records itself. Passive capture is the better fit for a flight recorder, which is why Claude Code support is the priority.\\n\\n## Quick start\\n\\n```bash\\npnpm install\\npnpm dev\\n```\\n\\nOpen `http://localhost:3000` and press **Load demo session**. Select timeline events to inspect payloads, diffs, metadata, and their cryptographic links. Press **Tamper session** to mutate a `FILE_WRITE` payload: chain verification immediately turns red and the corrupted event is highlighted.\\n\\n## Recording a Codex session\\n\\n```bash\\npnpm record:codex -- --cd /path/to/your/project -- \\\"Fix the failing validation test\\\"\\n```\\n\\nUse `--cd` to point at the project you want Codex to edit; the wrapper adds Codex's non-Git-project flag automatically when that directory has no `.git`. Add `--model` to choose a model, and `--html` to emit a replay page alongside the JSON.\\n\\nIf Codex cannot be found, install it with `npm install -g @openai/codex`, or point Glasshouse at a nonstandard location:\\n\\n```bash\\nCODEX_BIN=\\\"$(command -v codex)\\\" pnpm record:codex -- --cd /path/to/your/project -- \\\"Fix the failing test\\\"\\n```\\n\\nThe wrapper runs `codex exec --json`, records allowed observable events, **ignores `reasoning` events**, and writes a tamper-evident session to `storage/sessions`. Refresh the web app afterwards and the session appears in the sidebar.\\n\\nSee [the Codex-first guide](docs/codex-first.md) and [Using Codex 5.6 with Glasshouse-lite](docs/using-codex-5-6.md) for the full workflow.\\n\\n## Recording a Claude Code session\\n\\nUnlike the Codex wrapper, Claude Code recording is passive: register\\n`bin/glasshouse-claude-hook.mjs` once in a project's `.claude/settings.json`\\nhooks, and every session in that project records itself from then on, no\\nper-invocation command needed.\\n\\nSee [the Claude Code hooks guide](docs/claude-code-hooks.md) for the settings\\nsnippet and a table of exactly which hook events and tools get recorded.\\n\\n## Self-contained replay files\\n\\nAny session can be emitted as a single HTML file containing both the data and the viewer. No dependencies, no network requests, no server — open it in a browser, attach it to a pull request, or send it to a reviewer.\\n\\n```bash\\n# Record and emit the replay file in one step\\npnpm record:codex -- --cd /path/to/your/project --html -- \\\"Fix the failing test\\\"\\n\\n# Convert a session recorded earlier\\npnpm session:html storage/sessions/<id>.json\\n\\n# Build the empty viewer, which accepts any session dropped onto it\\npnpm build:viewer\\n```\\n\\nVerification runs inside the page: the chain is recomputed from the embedded events on load, so a modified file reports **HASH VERIFICATION FAILED** and highlights the offending event. A typical session is around 35 KB; the viewer alone is 29 KB.\\n\\nThis is the distribution path. The Next.js dashboard stays the local development surface, since it watches `storage/sessions` and lists recordings as they appear.\\n\\n## Hosting the viewer\\n\\n`vercel.json` deploys the standalone viewer as a static site. Visitors drop a session file onto the page and it replays entirely client-side — **sessions are never uploaded**, which is what makes a public viewer safe.\\n\\n```bash\\nvercel --prod\\n```\\n\\nTwo things to know:\\n\\n- **Root Directory must be the repository root** in your Vercel project settings. If it points at `apps/web`, the build runs in the wrong directory and cannot find `bin/`.\\n- **Install is skipped deliberately.** The viewer has zero dependencies, and skipping install sidesteps the lockfile drift described under Known issues.\\n\\nTo publish a specific session at a permanent URL, generate it into `site/` before deploying (`pnpm session:html <session>.json site/demo.html` → `/demo`). `site/` is gitignored so this is opt-in per file. Treat anything placed there as public: sessions embed real diffs and command output.\\n\\nThe Next.js dashboard is **not** deployable as-is. Its API reads and writes `storage/sessions` on the local filesystem, which does not survive on serverless hosting. Multi-user hosting needs a database and authentication — see Roadmap.\\n\\n## Repository layout\\n\\n```text\\napps/web             Next.js replay dashboard (local development)\\nbin/                 Recorder and HTML build CLIs\\npackages/core        Event, session, and adapter contracts\\npackages/codex-adapter    Codex `exec --json` event normalization\\npackages/claude-adapter   Claude Code hook event normalization\\npackages/hash        Canonical SHA-256 chain + verification\\npackages/sdk         Small recording API for agent integrations\\npackages/replay      Time-to-event replay helpers\\npackages/viewer      Self-contained single-file HTML replay build\\npackages/ui          Future shared UI primitives\\nstorage/sessions     Recorded sessions\\n```\\n\\n## SDK\\n\\nFor instrumenting your own agent:\\n\\n```ts\\nimport { glasshouse } from \\\"@glasshouse/sdk\\\";\\n\\nawait glasshouse.startSession(\\\"codex-cli\\\");\\nawait glasshouse.record({\\n  type: \\\"FILE_WRITE\\\",\\n  payload: { path: \\\"src/auth.ts\\\", before: \\\"...\\\", after: \\\"...\\\" }\\n});\\nawait glasshouse.finish();\\nconst integrity = await glasshouse.verify();\\nconst archive = glasshouse.export();\\n```\\n\\n`AgentAdapter` in `@glasshouse/core` gives every integration a consistent start/stop/event surface. An adapter's only job is translating observable agent hooks into Glasshouse events.\\n\\n## Security model\\n\\nGlasshouse records only observable events supplied by the host agent. Do not record hidden reasoning, private prompts outside the chosen policy, secrets, or raw environment variables.\\n\\nHash chaining provides **tamper evidence, not tamper proofing**. It reliably detects edits, deletions, and reordering of an existing session. It does not stop someone from forging an entirely new, internally consistent chain — that requires signing sessions at the recorder and storing them append-only, which is on the roadmap. Until then, treat a verified chain as evidence the file has not been altered since recording, not as proof of who recorded it.\\n\\nBecause replay is fully client-side, session contents stay on the reviewer's machine. Publishing a session to a public URL is the one action that changes this; do it deliberately.\\n\\n## Known issues\\n\\n- `pnpm install --frozen-lockfile` fails: `packages/codex-adapter/package.json` declares `@glasshouse/core` but `pnpm-lock.yaml` has no entry for it. CI defaults to frozen, so any build needing dependencies will break until the lockfile is regenerated.\\n- `pnpm-lock.yaml` was generated by pnpm 10 while `package.json` pins `pnpm@9.15.0`.\\n- The viewer implements SHA-256 in plain JavaScript rather than using `crypto.subtle`, so verification works offline from `file://` without a secure context. It is verified against Node's `crypto`, but **it must stay in sync with `packages/hash`** — changing the canonicalization or hash formula means changing both.\\n\\n## Roadmap\\n\\n- Gemini CLI adapter via `.gemini/settings.json` `BeforeTool`/`AfterTool` hooks\\n- File-write fallback (git-diff watch) for agents whose hooks don't cover every write, e.g. Codex's `apply_patch`\\n- `glasshouse watch` — terminal tail of a session as it records, ahead of a full TUI\\n- `glasshouse serve` — localhost WebSocket live view feeding the existing replay viewer, instead of only post-hoc HTML export\\n- Append-only SQLite/Postgres and signed session exports\\n- Monaco-powered full file diff, artifact snapshots, and search\\n- Team session sharing, retention policy, and compliance export\\n- Adapter registry and OpenTelemetry bridge\\n- Secret redaction before a session is written\\n\\n## Demo script (three minutes)\\n\\n1. Introduce Glasshouse as the black box for coding agents: it captures actions, not private reasoning.\\n2. Load a session and play the timeline: prompt → file read → code edit → failed test → retry → passing tests.\\n3. Open the file-write event and show the captured unified diff and its hashes.\\n4. Press **Tamper session**. The status becomes **HASH VERIFICATION FAILED** and the edit is visibly marked.\\n5. Explain that adapters only need to translate observable agent hooks into events.\"\nstorage/sessions/c0d85437-836e-4866-b01a-410d570bc7ba.json:        \"command\": \"grep -riE \\\"api[_-]?key|token|secret|password|AKIA|sk-ant|sk-proj\\\" storage/sessions/*.json | head -20\","
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "PostToolUse",
+        "toolName": "Bash"
+      },
+      "previous_hash": "40974e82b098f1ce75f7ffe3d011aa26fb676a651767bbe98d1aabed96d6549f",
+      "current_hash": "62f8482f62ee2f7059f44a26800ee13d4921e5b3d7862fbc5565f02f6e9bba87"
+    },
+    {
+      "id": "ac8d3137-9157-4160-a428-f50c0c2e7880",
+      "timestamp": "2026-07-29T13:52:20.382Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "outcome": "success"
+      },
+      "metadata": {
+        "source": "claude-code",
+        "hookEvent": "Stop"
+      },
+      "previous_hash": "62f8482f62ee2f7059f44a26800ee13d4921e5b3d7862fbc5565f02f6e9bba87",
+      "current_hash": "e3cbe9baaf31a501f88a27001b2707efb65c7bc28ee6d61e49f6b1315e1971dd"
+    }
+  ],
+  "finishedAt": "2026-07-29T13:52:20.385Z"
+}

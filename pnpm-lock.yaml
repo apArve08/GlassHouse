@@ -49,6 +49,18 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
+  packages/claude-adapter:
+    dependencies:
+      '@glasshouse/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/codex-adapter:
+    dependencies:
+      '@glasshouse/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/core: {}
 
   packages/hash:
@@ -73,6 +85,8 @@ importers:
         version: link:../hash
 
   packages/ui: {}
+
+  packages/viewer: {}
 
 packages:
 

@@ -1,0 +1,124 @@
+{
+  "id": "08208afc-9c03-47e4-9852-8db44260baf3",
+  "title": "Fix validation so completed tasks cannot have an empty title.",
+  "agent": "codex-cli",
+  "startedAt": "2026-07-19T09:00:00.000Z",
+  "finishedAt": "2026-07-19T09:00:31.000Z",
+  "events": [
+    {
+      "id": "evt_001",
+      "timestamp": "2026-07-19T09:00:00.000Z",
+      "type": "SESSION_STARTED",
+      "payload": {
+        "agent": "Codex CLI",
+        "repository": "acme/todo-api",
+        "branch": "fix/task-validation"
+      },
+      "metadata": {
+        "model": "gpt-5.6",
+        "environment": "local"
+      },
+      "previous_hash": "GLASSHOUSE_GENESIS_V1",
+      "current_hash": "be295a3a5bb83a5034a4394d2ac2feeff06304e95c65ec5f0bc750070f8cc08e"
+    },
+    {
+      "id": "evt_002",
+      "timestamp": "2026-07-19T09:00:02.000Z",
+      "type": "USER_PROMPT",
+      "payload": {
+        "text": "Fix validation so completed tasks cannot have an empty title."
+      },
+      "previous_hash": "be295a3a5bb83a5034a4394d2ac2feeff06304e95c65ec5f0bc750070f8cc08e",
+      "current_hash": "d694c8e7f8d907fa3370ec6755b2ccc81c8b650334645017d1b1b3138c7569cb"
+    },
+    {
+      "id": "evt_003",
+      "timestamp": "2026-07-19T09:00:05.000Z",
+      "type": "FILE_READ",
+      "payload": {
+        "path": "src/tasks/validate.ts",
+        "lines": "1-84"
+      },
+      "duration": 42,
+      "previous_hash": "d694c8e7f8d907fa3370ec6755b2ccc81c8b650334645017d1b1b3138c7569cb",
+      "current_hash": "aa379edaa9b1e8947f516b7e75ab3946a2229aa45e0eccf6fafb32d3886ce3d1"
+    },
+    {
+      "id": "evt_004",
+      "timestamp": "2026-07-19T09:00:06.000Z",
+      "type": "FILE_WRITE",
+      "payload": {
+        "path": "src/tasks/validate.ts",
+        "before": "export function validate(task: Task) {\n  return task.title.length > 0\n}",
+        "after": "export function validate(task: Task) {\n  return task.title.trim().length > 0\n}",
+        "additions": 1,
+        "deletions": 1
+      },
+      "duration": 18,
+      "previous_hash": "aa379edaa9b1e8947f516b7e75ab3946a2229aa45e0eccf6fafb32d3886ce3d1",
+      "current_hash": "cef3d8c841f5233a2477596b63975dfce2989408a321d41459b78c930ef44f2a"
+    },
+    {
+      "id": "evt_005",
+      "timestamp": "2026-07-19T09:00:09.000Z",
+      "type": "COMMAND_STARTED",
+      "payload": {
+        "command": "pnpm test",
+        "cwd": "/projects/todo-api"
+      },
+      "previous_hash": "cef3d8c841f5233a2477596b63975dfce2989408a321d41459b78c930ef44f2a",
+      "current_hash": "6683149e8b4c3381f057a79a04c1036b8d6ab9292568823e336934ba2a56ca9e"
+    },
+    {
+      "id": "evt_006",
+      "timestamp": "2026-07-19T09:00:15.000Z",
+      "type": "STDERR",
+      "payload": {
+        "output": "FAIL  validates completed task with whitespace title\nExpected: false\nReceived: true",
+        "exitCode": 1
+      },
+      "duration": 6100,
+      "previous_hash": "6683149e8b4c3381f057a79a04c1036b8d6ab9292568823e336934ba2a56ca9e",
+      "current_hash": "3691a3e300cfc41187c5183dba89e740c4f1d72585182bba7412a9c5d4c75476"
+    },
+    {
+      "id": "evt_007",
+      "timestamp": "2026-07-19T09:00:22.000Z",
+      "type": "FILE_WRITE",
+      "payload": {
+        "path": "src/tasks/validate.ts",
+        "before": "return task.title.trim().length > 0",
+        "after": "return typeof task.title === 'string' && task.title.trim().length > 0",
+        "additions": 1,
+        "deletions": 1
+      },
+      "duration": 26,
+      "previous_hash": "3691a3e300cfc41187c5183dba89e740c4f1d72585182bba7412a9c5d4c75476",
+      "current_hash": "9fff65efcb26f3e164ae37ec60977e3ad79225c0ab226e4be8c4ac69419b7631"
+    },
+    {
+      "id": "evt_008",
+      "timestamp": "2026-07-19T09:00:30.000Z",
+      "type": "TEST_FINISHED",
+      "payload": {
+        "command": "pnpm test",
+        "passed": 42,
+        "failed": 0,
+        "status": "passed"
+      },
+      "duration": 4320,
+      "previous_hash": "9fff65efcb26f3e164ae37ec60977e3ad79225c0ab226e4be8c4ac69419b7631",
+      "current_hash": "d8eddc0798955f54f6348562b8ea6ba4e0b7ab0ce901d00afde560005cb52bef"
+    },
+    {
+      "id": "evt_009",
+      "timestamp": "2026-07-19T09:00:31.000Z",
+      "type": "SESSION_FINISHED",
+      "payload": {
+        "outcome": "success"
+      },
+      "previous_hash": "d8eddc0798955f54f6348562b8ea6ba4e0b7ab0ce901d00afde560005cb52bef",
+      "current_hash": "ed1dc168b843867a182484e7d993fc67f7691a9651a942318f0803d778aad280"
+    }
+  ]
+}
